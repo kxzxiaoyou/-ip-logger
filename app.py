@@ -16,9 +16,12 @@ def index():
 def send_email(to, msg):
     gmail_user = os.environ.get("GMAIL_USER")
     gmail_pass = os.environ.get("GMAIL_PASS")
-    
+
     server = smtplib.SMTP("smtp.gmail.com", 587)
     server.starttls()
     server.login(gmail_user, gmail_pass)
     server.sendmail(gmail_user, to, msg)
     server.quit()
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
