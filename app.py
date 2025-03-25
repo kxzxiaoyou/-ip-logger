@@ -9,7 +9,7 @@ app = Flask(__name__)
 def index():
     user_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    message = f"[{timestamp}] 訪客 IP：{user_ip}"
+    message = f"[{timestamp}] Visitor IP: {user_ip}"
     send_email("sces9204@gmail.com", message)
     return render_template("index.html")
 
